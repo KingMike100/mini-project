@@ -197,8 +197,29 @@ pre code {
 <li>Alpha diversity: <a href="https://joey711.github.io/phyloseq/plot_richness-examples.html" class="uri">https://joey711.github.io/phyloseq/plot_richness-examples.html</a></li>
 <li>Differential abundance: <a href="http://joey711.github.io/phyloseq-extensions/DESeq2.html" class="uri">http://joey711.github.io/phyloseq-extensions/DESeq2.html</a></li>
 </ul>
-<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
+</div>
+<div id="descriptive-summaries-of-the-subject-data-using-appropriate-graphics-and-statistical-summary-measures" class="section level3">
+<h3>Descriptive summaries of the subject data using appropriate graphics and statistical summary measures</h3>
+<p>Using the summary function to get a summary of descriptive statistics which include mean, median, 25th and 75th quartiles, min, max</p>
+<pre class="r"><code>data &lt;- read.csv(&quot;diabimmune_16s_t1d_metadata.csv&quot;);
+summary(data)</code></pre>
+<pre><code>##   Sample_ID          Subject_ID        Case_Control          Gender         
+##  Length:777         Length:777         Length:777         Length:777        
+##  Class :character   Class :character   Class :character   Class :character  
+##  Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+##                                                                             
+##                                                                             
+##                                                                             
+##  Delivery_Route     Age_at_Collection
+##  Length:777         Min.   :   6.0   
+##  Class :character   1st Qu.: 229.0   
+##  Mode  :character   Median : 452.0   
+##                     Mean   : 482.9   
+##                     3rd Qu.: 702.0   
+##                     Max.   :1233.0</code></pre>
+</div>
+<div id="appropriate-tests-to-check-for-associationindependency-between-disease-status-and-other-variables" class="section level3">
+<h3>Appropriate tests to check for association/independency between disease status and other variables</h3>
 <pre class="r"><code>summary(cars)</code></pre>
 <pre><code>##      speed           dist       
 ##  Min.   : 4.0   Min.   :  2.00  
