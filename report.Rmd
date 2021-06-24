@@ -3,9 +3,9 @@ title: "Mini project report"
 author: "Mike Nsubuga"
 date: "6/4/2021"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -45,9 +45,53 @@ summary(data)
 
 ### Appropriate tests to check for association/independency between disease status and other variables 
 
+
+
+### Phyloseq
+
+
+Using phyloseq, create a phyloseq object. this will comprise the OTU abundance, taxonomy(provided in the .txt file) and sample data(provided in the .csv file)
+
+```{r}
+otuTable <- read.table("otu_table")  #Importing the OTU table
+head(otuTable, n = 5)
+```
+
+```{r}
+taxaTable <- read.table("taxa_table") #Importing the Taxa table
+head(taxaTable, n = 5)
+```
+
+
+```{r}
+dim(otuTable)
+```
+
+```{r}
+dim(taxaTable)
+```
+
+```{r}
+class(otuTable)
+```
+
+```{r}
+class(taxaTable)
+```
+
+
+
+
+
+
+
 ```{r cars}
 summary(cars)
 ```
+
+
+
+
 
 ## Including Plots
 
