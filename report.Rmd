@@ -43,6 +43,32 @@ data <- read.csv("diabimmune_16s_t1d_metadata.csv");
 summary(data)
 ```
 
+```{r}
+dim(data)
+```
+
+```{r}
+class(data)
+
+```
+
+### Graphical summary representation of the data
+Bar charts representing the number of occurences in each category
+
+#### Number of Cases and Controls
+```{r}
+library(ggplot2)
+table(data$Case_Control)
+qplot(data$Case_Control) + geom_bar()
+
+```
+
+#### Number of Males and Females
+```{r}
+table(data$Gender)
+qplot(data$Gender) + geom_bar()
+
+```
 ### Appropriate tests to check for association/independency between disease status and other variables 
 
 
@@ -79,26 +105,63 @@ class(otuTable)
 class(taxaTable)
 ```
 
+```{r}
+#Converting the Taxa and OTU Table into a Matrix
+mtaxaTable <- as.matrix(taxaTable)
+motuTable <- as.matrix(otuTable)
 
+class(mtaxaTable)
+class(motuTable)
+```
 
+```{r}
+#Data Cleansing. This is done to have consistet data across all the matrices
+#This will involve making sure that the OTU/taxa row names match. Currently they dont as taxa have a trailing ";"
 
+#rownames(mtaxaTable)[rownames(mtaxaTable) == "4333897;"] = "4333897"
 
+head(mtaxaTable)
+tnames <- rownames(mtaxaTable)  #Extract rownames from the matrix
+ntnames <- gsub(x = tnames, pattern = ";", replacement = "")  #Remove the ; from the extracted rownames
+#ntnames
+rownames(mtaxaTable) <- ntnames  #Set the new rownames
+head(mtaxaTable)
 
+```
 
-```{r cars}
-summary(cars)
+```{r}
+library(phyloseq)
+library(ggplot2)
+
+#Tell phyloseq to load them into a phyloseq object
+OTU = otu_table(motuTable, taxa_are_rows = TRUE)
+TAX = tax_table(mtaxaTable)
+
+#OTU
+#TAX
+
+#Generating the phyloseq object
+physeq = phyloseq(OTU, TAX)
+physeq
+
+#Plotting the phyloseq
+plot_bar(physeq, fill = "Family.")
 ```
 
 
+## Question 3. 
+Generate Alpha diversity plots and ordination plots. Examine any observed patterns by delivery mode, gender and disease status
 
+```{r}
 
+plot_richness(physeq)  #Defauit plot produced by the plot_richness function
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+### Alpha diversity comparison between the gender in cases and control
+```{r}
+#plot_richness(physeq = physeq, x ="Case_Control")
+
+```
+
+
