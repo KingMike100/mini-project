@@ -3,9 +3,9 @@ title: "R Mini-Project Report"
 author: "Mike Nsubuga"
 date: "6/4/2021"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -13,6 +13,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## MSB7102 Mini-project, Semester 1, 2021
+### Student Details
+##### Name: Mike Nsubuga
+##### Student Number: 2000720912
+##### Registration Number: 2020/HD07/20912U
+##### Course: R and Bio Conductor
+##### Email: nsubugamike021@gmail.com
 
 ### Background
 This is an assessed exercise that will contribute to coursework for this module. It is aimed at providing an experience with all that has been covered throughout the semester. The tasks are based on two Bioconductor packages; phyloseq and DEseq2. Endeavor to look at the documentation and the links indicated below may be useful. The data files are located in the shared google drive folder.
@@ -234,7 +240,9 @@ Generate Alpha diversity plots and ordination plots. Examine any observed patter
 plot_richness(physeq)  #Default plot produced by the plot_richness function
 
 ```
-To observe patterns across variables, we need to merge the sample data into the phyloseq object.
+
+
+##### 3.1. To observe patterns across variables, we need to merge the sample data into the phyloseq object.
 
 ```{r}
 library(tibble)
@@ -246,18 +254,18 @@ mergedPhyseq = merge_phyloseq(physeq, s_data)
 mergedPhyseq
 ```
 
-#### Alpha diversity comparison between the gender in cases and control
+#### 3.2. Alpha diversity comparison between the gender in cases and control
 ```{r}
 plot_richness(mergedPhyseq, x ="Case_Control", color="Delivery_Route")
 
 ```
-#### Alpha diversity comparison between the Gender and Case Control
+#### 3.3. Alpha diversity comparison between the Gender and Case Control
 
 ```{r}
 plot_richness(mergedPhyseq, x ="Case_Control", color="Gender")
 
 ```
-#### Alpha diversity comparison between the Age and Case Control
+#### 3.4. Alpha diversity comparison between the Age and Case Control
 
 ```{r}
 plot_richness(mergedPhyseq, x ="Case_Control", color="Age_at_Collection")
@@ -267,4 +275,60 @@ plot_richness(mergedPhyseq, x ="Case_Control", color="Age_at_Collection")
 ### Question 4
 Perform differential abundance using DESEq2
 
+#### 4.1. DESeq2 conversion and call
 
+The function _phyloseq_to_deseq2_ converts your phyloseq-format microbiome data into a DESeqDataSet with dispersions estimated, using the experimental design formula. The DESeq function does the rest of the testing, in this case with default testing framework
+
+```{r}
+library(DESeq2)
+
+head(sample_data(mergedPhyseq)$Case_Control, 20)  # Summary of the first 20 entries for the study design factor
+
+deseqData = phyloseq_to_deseq2(mergedPhyseq, ~ Case_Control) # Converts the phyloseq-format microbiome data into a DESeqDataSet with dispersions estimated, using the experimental design formula
+
+#deseqData = DESeq(diagdds, test="Wald", fitType = "parametric")
+
+#The above function as noted on the phyloseq site returns an error. Issue is resolved here https://github.com/joey711/phyloseq/issues/387 and the function used in the next steps is got from the same link
+
+gm_mean = function(x, na.rm=TRUE){
+  exp(sum(log(x[x > 0]), na.rm=na.rm) / length(x))
+}
+geoMeans = apply(counts(deseqData), 1, gm_mean)
+deseqData = estimateSizeFactors(deseqData, geoMeans = geoMeans)
+deseqData = DESeq(deseqData, fitType = "local")
+
+```
+
+#### 4.2. Investigate test results table
+The following _results_ function call creates a table of the results of the tests. The hard work was already stored with the rest of the DESeq2-related data in our latest version of the deseqData object (see above). I then order by the adjusted p-value, removing the entries with an NA value. The rest of this example is just formatting the results table with taxonomic information for nice(ish) display in the HTML output.
+
+```{r}
+library(DESeq2)
+res = results(deseqData, cooksCutoff = FALSE)
+alpha = 0.01
+sigtab = res[which(res$padj < alpha), ]
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(mergedPhyseq)[rownames(sigtab), ], "matrix"))
+head(sigtab)
+dim(sigtab)
+```
+
+#### 4.3. A plot of the summary of the results
+```{r}
+library("ggplot2")
+theme_set(theme_bw())
+scale_fill_discrete <- function(palname = "Set1", ...) {
+  scale_fill_brewer(palette = palname, ...)
+}
+# Phylum order
+x = tapply(sigtab$log2FoldChange, sigtab$Phylum, function(x) max(x))
+x = sort(x, TRUE)
+sigtab$Phylum = factor(as.character(sigtab$Phylum), levels=names(x))
+# Genus order
+x = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x) max(x))
+x = sort(x, TRUE)
+sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
+ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + geom_point(size=6) + 
+  theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))
+
+
+```
