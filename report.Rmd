@@ -231,21 +231,40 @@ Generate Alpha diversity plots and ordination plots. Examine any observed patter
 
 ```{r}
 
-plot_richness(physeq)  #Defauit plot produced by the plot_richness function
+plot_richness(physeq)  #Default plot produced by the plot_richness function
 
+```
+To observe patterns across variables, we need to merge the sample data into the phyloseq object.
+
+```{r}
+library(tibble)
+s_data <- column_to_rownames(data, var="Sample_ID")
+s_data <- sample_data(s_data)
+#s_data
+
+mergedPhyseq = merge_phyloseq(physeq, s_data)
+mergedPhyseq
 ```
 
 #### Alpha diversity comparison between the gender in cases and control
 ```{r}
-#plot_richness(physeq = physeq, x ="Case_Control")
+plot_richness(mergedPhyseq, x ="Case_Control", color="Delivery_Route")
 
 ```
-#### Alpha diversity comparison between the Delivery Mode and Case Control
+#### Alpha diversity comparison between the Gender and Case Control
 
 ```{r}
-#plot_richness(physeq = physeq, x ="Case_Control")
+plot_richness(mergedPhyseq, x ="Case_Control", color="Gender")
+
+```
+#### Alpha diversity comparison between the Age and Case Control
+
+```{r}
+plot_richness(mergedPhyseq, x ="Case_Control", color="Age_at_Collection")
 
 ```
 
 ### Question 4
 Perform differential abundance using DESEq2
+
+
